@@ -324,6 +324,13 @@ class KizunaBot
     message += video_url
   end
 
+  def subscriber_count_message(query: nil)
+    subscriber_count =  subscriber_count_by_query(query)
+    retutn "わからなかった！ごめん！" if subscriber_count.nil?
+
+    message = "#{subscriber_count}人も登録者がいるみたい！"
+  end
+
   def random_video_url_by_channel(channel_id: nil)
     return if channel_id.nil?
 
@@ -361,6 +368,22 @@ class KizunaBot
     video_id = items.sample.dig("id", "videoId")
 
     "https://www.youtube.com/watch?v=#{video_id}"
+  end
+
+  def subscriber_count_by_query(query: nil)
+    query_str = "/channels?part=statistics&id="
+    query_str += "#{query}"
+    query_str += "&key=#{YOUTUBE_DATE_API_KEY}"
+
+    encoded_query = URI.encode(query_str)
+
+    response = RestClient.get("#{YOUTUBE_DATA_API_HOST}#{encoded_query}")
+    res_json = JSON.parse(response)
+    items = res_json["items"]
+    statistics = items.statistics
+    subscriber_count = statistics.subscriberCount
+
+    subscriberCount
   end
 
   def help_message
@@ -525,6 +548,8 @@ class KizunaBot
       ].sample
     when /今日のV(T|t)uber/
       video_search_message("VTuber")
+    when /ゆーま.+(登録者数|ファン).+？/
+      subscriber_count_message("UC_9DxYZ_4Lhm9ujFvcHryNw")
     when /ゆーま.+(？|\?)$/
       video_url = random_video_url_by_channel(channel_id: "UC_9DxYZ_4Lhm9ujFvcHryNw")
       "ゆーまってこの人かな？！ (੭ु ›ω‹ )੭ु⁾⁾ #{video_url}"
