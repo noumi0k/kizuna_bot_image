@@ -523,6 +523,8 @@ class KizunaBot
         "元気いっぱいだねー！！",
         "うん！！",
       ].sample
+    when /今日のV(T|t)uber/
+      video_search_message("VTuber")
     when /ゆーま.+(？|\?)$/
       video_url = random_video_url_by_channel(channel_id: "UC_9DxYZ_4Lhm9ujFvcHryNw")
       "ゆーまってこの人かな？！ (੭ु ›ω‹ )੭ु⁾⁾ #{video_url}"
